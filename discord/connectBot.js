@@ -43,7 +43,7 @@ async function connectToDiscord(token) {
     content: message.content,
     author: message.author.username,
   })
-  //newMessage.save();  
+  newMessage.save();  
   console.log(message)
 
   })
