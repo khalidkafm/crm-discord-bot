@@ -43,11 +43,27 @@ async function connectToDiscord(token) {
     content: message.content,
     author: message.author.username,
   })
+  //newMessage.save();  
+  console.log(message)
 
-  newMessage.save();  
+  })
 
-        console.log(message)
-    })
+  // RECEIVE GUILD MEMBERS ADD
+  client.on('guildMemberAdd', (member) => {
+    // Code à exécuter lorsque qu'un membre rejoint une guilde
+    console.log(`${member.user.tag} a rejoint la guilde ${member.guild.name}`);
+  });
+
+  // RECEIVE INVITE CREATION AND CHECK IF BOT
+  client.on('inviteCreate', (invite) => {
+    // Code à exécuter lorsque qu'une invitation est créée
+    console.log(`Une invitation a été créée : ${invite.url}`);
+  
+    // Vérifie si le bot a été ajouté à une guilde via cette invitation
+    if (invite.bot && invite.bot.id === client.user.id) {
+      console.log(`Le bot a été ajouté à la guilde via cette invitation.`);
+    }
+  });
 
     // Setting bot presence display
     /*client.user.setPresence({
