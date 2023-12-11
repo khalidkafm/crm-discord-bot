@@ -22,14 +22,24 @@ async function connectToDiscord(token) {
     intents: [
       GatewayIntentBits.Guilds,
       GatewayIntentBits.GuildMessages,
-      GatewayIntentBits.MessageContent
+      GatewayIntentBits.MessageContent,
+      GatewayIntentBits.GuildMembers,
+      GatewayIntentBits.GuildInvites,
       // Ajoutez d'autres intents au besoin
     ],
   });
 
   client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setActivity(`on ${client.guilds.cache.size} servers`);
+    console.log(`Ready to serve on ${client.guilds.cache.size} servers, for ${client.users.cache.size} users.`);
   });
+
+
+  // Managing errors, warns, and debugs from DiscordJS librairie
+  client.on("error", (e) => console.error(e));
+  client.on("warn", (e) => console.warn(e));
+  client.on("debug", (e) => console.info(e));
 
   // Collecting all new messages from discord server
   client.on("messageCreate", (message) => {
@@ -51,7 +61,7 @@ async function connectToDiscord(token) {
   // RECEIVE GUILD MEMBERS ADD
   client.on('guildMemberAdd', (member) => {
     // Code à exécuter lorsque qu'un membre rejoint une guilde
-    console.log(`${member.user.tag} a rejoint la guilde ${member.guild.name}`);
+    console.log(`New User "${member.user.username}" has joined "${member.guild.name}"` );
   });
 
   // RECEIVE INVITE CREATION AND CHECK IF BOT
@@ -64,14 +74,6 @@ async function connectToDiscord(token) {
       console.log(`Le bot a été ajouté à la guilde via cette invitation.`);
     }
   });
-
-    // Setting bot presence display
-    /*client.user.setPresence({
-        activities: [{
-            name: "analysing"
-        }],
-        status: "dnd"
-    });*/
 
     // Simple action from command bot
     client.on('interactionCreate', async (interaction) => {
