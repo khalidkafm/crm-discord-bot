@@ -17,6 +17,7 @@ async function saveInvites(guildId, codes) {
           // create new invite to save in db
           const newInvite = new Invite({
             code: code,
+            name: code,
             guild: guildId,
           });
 

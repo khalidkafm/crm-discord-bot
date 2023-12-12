@@ -2,8 +2,9 @@ const { Client, GatewayIntentBits, Collection } = require('discord.js');
 const mongodb = require('mongoose')
 const Message = require ('../models/messages')
 const Guild = require ('../models/guilds')
+const Member = require ('../models/members')
 const saveInvites = require('../utils/saveInvites')
-const saveMembers = require('../utils/saveMembers')
+const saveMemberToDb = require('../utils/saveMemberToDb')
 require('dotenv').config()
 
 // Adding bot link
@@ -138,12 +139,44 @@ async function connectToDiscord() {
     //
     //---------------------------------------------------------------------------------------------------------
 
-    client.on("guildCreate", (guild) => {
+    client.on("guildCreate", async (guild) => {
+
+      // Updating the guild in DB 
+      const guildId = new mongodb.Types.ObjectId(`${guild.id.toString(16).padStart(24, '0')}`); // convert to hex and pad with zeros
+      try {
+        const result = await Guild.updateOne(
+          { _id: guildId },
+          { id: guild.id ,
+            name:guild.name,
+            icon: guild.icon,
+            permissions: '', 
+            ownerId: guild.ownerId,
+            joinedTimestamp: guild.joinedTimestamp, },
+          { upsert: true }
+        );
+      } catch {
+        error => {
+          console.error('error while updating guild in mongoDB:', error)
+        }
+      }
+
       // We've been added to a new Guild. Let's fetch all the invites, and save it to our cache
-      guild.invites.fetch().then(guildInvites => {
-        // This is the same as the ready event
-        invites.set(guild.id, new Map(guildInvites.map((invite) => [invite.code, invite.uses])));
-      })
+      const firstInvites = await guild.invites.fetch();
+
+      // Set the key as Guild ID, and create a map which has the invite code, and the number of uses
+      invites.set(guild.id, new Collection(firstInvites.map((invite) => [invite.code, invite.uses])));
+      // Saving guild Invites in DB 
+      try { 
+        // convert firstInvites array to invite codes array
+        const codes = firstInvites.map((invite) => invite.code);
+        // saving codes to db
+        await saveInvites( guildId.toString() , codes);
+
+      } catch {
+        error => console.error('error while updating invites in mongoDB:', error)
+      };
+
+      
     });
     
     client.on("guildDelete", (guild) => {
@@ -158,6 +191,7 @@ async function connectToDiscord() {
     //---------------------------------------------------------------------------------------------------------
 
     client.on("guildMemberAdd", async (member) => {
+      const timestamp = member.joinedAt;
       console.log(`New User "${member.user.username}" has joined "${member.guild.name}"` );
       // To compare, we need to load the current invite list.
       const newInvites = await member.guild.invites.fetch()
@@ -166,13 +200,15 @@ async function connectToDiscord() {
       // Look through the invites, find the one for which the uses went up.
       const invite = newInvites.find(i => i.uses > oldInvites.get(i.code));
       // This is just to simplify the message being sent below (inviter doesn't have a tag property)
-      const inviter = await client.users.fetch(invite.inviter.id);
+      let inviter;
+      if(invite){
+        inviter = await client.users.fetch(invite.inviter.id);
+      }
       // Get the log channel (change to your liking)
-      const logChannel = member.guild.channels.cache.find(channel => channel.name === "general-original");
+      //const logChannel = member.guild.channels.cache.find(channel => channel.name === "general-original");
       // A real basic message with the information we need. 
-      inviter
-        ? logChannel.send(`${member.user.tag} joined using invite code ${invite.code} from ${inviter.tag}. Invite was used ${invite.uses} times since its creation.`)
-        : logChannel.send(`${member.user.tag} joined but I couldn't find through which invite.`);
+      const saveOk = await saveMemberToDb(timestamp, member, invite, inviter)
+      console.log('saveOk : ', saveOk)
     });
 
     //---------------------------------------------------------------------------------------------------------
@@ -182,21 +218,39 @@ async function connectToDiscord() {
     //---------------------------------------------------------------------------------------------------------
 
     // Collecting all new messages from discord server
-    client.on("messageCreate", (message) => {
+    client.on("messageCreate", async (message) => {
 
-      const newMessage = new Message({
-        channelId: message.channelId,
-        guildId: message.guildId,
-        id: message.id,
-        createdTimestamp: message.createdTimestamp,
-        type: message.type,
-        content: message.content,
-        author: message.author.username,
-      })
-      newMessage.save();  
+      const authorId = new mongodb.Types.ObjectId(`${message.author.id.toString(16).padStart(24, '0')}`); // convert to hex and pad with zeros
 
-      //Console.log messages for check on launch
-      console.log(message)
+      const memberFromDb = await Member.findById(authorId)
+          if(memberFromDb){
+
+            const guildId = new mongodb.Types.ObjectId(`${message.guildId.toString(16).padStart(24, '0')}`); // convert to hex and pad with zeros
+
+            const newMessage = new Message({
+              channelId: message.channelId,
+              guild: guildId,
+              id: message.id,
+              createdTimestamp: message.createdTimestamp,
+              type: message.type,
+              content: message.content,
+              author: authorId,
+            })
+            newMessage.save();  
+      
+            //Console.log messages for check on launch
+            console.log(newMessage)
+              
+          } else {
+              console.log(`Author NOT found in db for message: ${message.content}`)
+
+              /*const newMember = new Member({
+                  _id : memberId,
+                  id: member.user.id,
+                  name: member.user.username,
+              })
+              await newMember.save();*/
+          }
       });
 
     // Simple action from command bot

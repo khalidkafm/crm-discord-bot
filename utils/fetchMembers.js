@@ -1,6 +1,6 @@
 const Member = require ('../models/members')
 
-async function saveMembers(guild) {
+async function fetchMembers(guild) {
     
     const members = new Map();
 
@@ -34,4 +34,4 @@ async function saveMembers(guild) {
 
 };
 
-module.exports = saveMembers;
+module.exports = fetchMembers;

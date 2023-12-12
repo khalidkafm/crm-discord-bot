@@ -25,7 +25,7 @@ new mongodb.Schema(
 		},
         joinedTimestamp: {
 			type: Number,
-			required: true
+			required: false
 		},
 	}
 ));

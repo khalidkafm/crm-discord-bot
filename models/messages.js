@@ -7,8 +7,9 @@ new mongodb.Schema(
 			type: String,
 			required: true
 		},
-        guildId: {
-			type: String,
+        guild: {
+			type: mongodb.Schema.Types.ObjectId,
+			ref: 'Guild',
 			required: true
 		},
         id: {
@@ -16,7 +17,7 @@ new mongodb.Schema(
 			required: true
 		},
         createdTimestamp: {
-			type: Number,
+			type: String,
 			required: true
 		},
         type: {
@@ -28,9 +29,10 @@ new mongodb.Schema(
 			required: false
 		},
         author: {
-			type: String,
+			type: mongodb.Schema.Types.ObjectId,
+			ref: 'Member',
 			required: true
-		}		
+		},	
 	}
 ));
 
