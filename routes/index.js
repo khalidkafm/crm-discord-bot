@@ -23,7 +23,7 @@ router.get('/members/:inviteId', async function(req, res, next) {
 /* GET home page. */
 router.get('/invites/:guildId', async function(req, res, next) {
   const guildId = new mongodb.Types.ObjectId(`${req.params.guildId.toString(16).padStart(24, '0')}`); // convert to hex and pad with zeros 
-  Invite.find({guild: guildId}).populate('member')
+  Invite.find({guild: guildId})
   .then(data => {
       const members = [];
   
