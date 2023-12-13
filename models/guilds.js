@@ -3,7 +3,7 @@ const mongodb = require("mongoose");
 const Guild = mongodb.models.Guild || mongodb.model("Guild",
 new mongodb.Schema(
 	{
-        id: {
+        discordId: {
 			type: String,
 			required: true
 		},

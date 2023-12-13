@@ -5,11 +5,8 @@ const Member = require ('../models/members')
 const JoinEvent = require('../models/joinEvents')
 const mongodb = require('mongoose');
 const Invite = require('../models/invites');
+const discordToMongoId = require('../utils/idConversion/discordToMongoId');
 
-/* GET home page. */
-router.get('/search', async function(req, res, next) {
-  
-});
 
 /* GET home page. */
 router.get('/members/:inviteId', async function(req, res, next) {
@@ -22,8 +19,8 @@ router.get('/members/:inviteId', async function(req, res, next) {
 
 /* GET home page. */
 router.get('/invites/:guildId', async function(req, res, next) {
-  const guildId = new mongodb.Types.ObjectId(`${req.params.guildId.toString(16).padStart(24, '0')}`); // convert to hex and pad with zeros 
-  Invite.find({guild: guildId})
+  
+  Invite.find({guild: discordToMongoId(req.params.guildId)})
   .then(data => {
       const members = [];
   

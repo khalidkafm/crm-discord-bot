@@ -3,11 +3,11 @@ const mongodb = require("mongoose");
 const Member = mongodb.models.Member || mongodb.model("Member",
 new mongodb.Schema(
 	{
-        id: {
+        discordId: {
 			type: String,
-			required: true
+			required: false
 		},
-		name: {
+		username: {
 			type: String,
 			required: true
 		},

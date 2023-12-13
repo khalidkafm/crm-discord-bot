@@ -1,4 +1,5 @@
 const Member = require ('../models/members')
+const discordToMongoId = require('../utils/idConversion/discordToMongoId');
 
 async function fetchMembers(guild) {
     

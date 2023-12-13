@@ -3,6 +3,10 @@ const mongodb = require("mongoose");
 const Message = mongodb.models.Message || mongodb.model("Message",
 new mongodb.Schema(
 	{
+		discordId: {
+			type: String,
+			required: true
+		},
 		channelId: {
 			type: String,
 			required: true
@@ -10,10 +14,6 @@ new mongodb.Schema(
         guild: {
 			type: mongodb.Schema.Types.ObjectId,
 			ref: 'Guild',
-			required: true
-		},
-        id: {
-			type: String,
 			required: true
 		},
         createdTimestamp: {

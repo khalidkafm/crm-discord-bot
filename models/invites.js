@@ -3,7 +3,11 @@ const mongodb = require("mongoose");
 const Invite = mongodb.models.Invite || mongodb.model("Invite",
 new mongodb.Schema(
 	{
-        code: {
+        discordId: {
+			type: String,
+			required: false
+		},
+		code: {
 			type: String,
 			required: true
 		},
