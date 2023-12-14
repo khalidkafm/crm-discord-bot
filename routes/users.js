@@ -29,9 +29,12 @@ router.get('/', function (req, res, next) {
 // })
 
 router.get('/workspaces/:memberId', async (req, res, next) => {
-  const client = await connectToDiscord(process.env.DISCORD_BOT_SECRET)
+  const client = await connectToDiscord()
+  // client.once('ready', async ()=>{
 
-  if (client) {
+
+try {
+  if (client && client.user) {
     const botId = client.user.id;
     const newtableau = [];
     await client.guilds.fetch({ cache: false }); // mise à jour des guilds dans le cache
@@ -60,13 +63,18 @@ router.get('/workspaces/:memberId', async (req, res, next) => {
       res.send({ result: true, arraylength: newtableau.length, tableau: newtableau, });
     }
   }
+}
+  catch (error) {
+    console.error("Erreur lors de la connexion à Discord:", error);
+  }
+// })
 });
 
 router.get('/workspaces/:memberId/:guildId', async (req, res, next) => {
   const client = await connectToDiscord(process.env.DISCORD_BOT_SECRET)
 //ma guilde : 1179468608410234941
 //mon ID : 1044963840632303659
-  if (client ) {//checker parce que parfois ça fait planter le lancement
+  if (client && client.user ) {//checker parce que parfois ça fait planter le lancement
     const botId = client.user.id;
     const theuser = [];
     const theguild = [];
