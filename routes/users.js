@@ -30,9 +30,9 @@ router.get('/', function (req, res, next) {
 
 router.get('/workspaces/:memberId', async (req, res, next) => {
   const client = await connectToDiscord()
-  // client.once('ready', async ()=>{
-
-
+  
+// à améliorer car lorsque le client n'est pas 'on', la route dans le vide indéfiniment
+// avec setTimeOut, ça devrait être corrigé
 try {
   if (client && client.user) {
     const botId = client.user.id;
@@ -67,7 +67,6 @@ try {
   catch (error) {
     console.error("Erreur lors de la connexion à Discord:", error);
   }
-// })
 });
 
 router.get('/workspaces/:memberId/:guildId', async (req, res, next) => {
