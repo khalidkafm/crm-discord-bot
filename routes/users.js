@@ -40,7 +40,11 @@ try {
     await client.guilds.fetch({ cache: false }); // mise à jour des guilds du BOT dans le cache
     if (client.guilds.cache.values()) {
       for (const guild of client.guilds.cache.values()) {// vérif guild par guild
-        await guild.members.fetch({ user: req.params.memberId }); // guilds auxquelles on a accès et où le user est connecté 
+        try{
+          await guild.members.fetch({ user: req.params.memberId }); // guilds auxquelles on a accès et où le user est connecté 
+        }catch(error){
+          console.error("Erreur lors de la recherche de guilds:", error);
+        }
         const mybot = guild.members.cache.get(botId);// BOT ID 
         if (mybot.permissions.toArray().includes('Administrator')) {// où mon BOT est administrateur
           if (guild.members.cache.values()) {//vérif qu'on a une valeur pour continuer la logique
@@ -61,7 +65,11 @@ try {
           }
         }
       }
-      res.send({ result: true, arraylength: newtableau.length, tableau: newtableau, });
+      if(newtableau[0]){
+        res.json({ result: true, arraylength: newtableau.length, tableau: newtableau, });
+      }else{
+        res.json({result: false});
+      }
     }
   }
 }
