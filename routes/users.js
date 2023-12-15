@@ -28,54 +28,101 @@ router.get('/', function (req, res, next) {
 
 // })
 
-router.get('/workspaces/:memberId', async (req, res, next) => {
-  const client = await connectToDiscord()
+// router.get('/workspaces/:memberId', async (req, res, next) => {
+//   const client = await connectToDiscord()
   
-// à améliorer car lorsque le client n'est pas 'on', la route dans le vide indéfiniment
-// avec setTimeOut, ça devrait être corrigé
-try {
-  if (client && client.user) {
-    const botId = client.user.id;
-    console.log(botId)
-    const newtableau = [];
-    await client.guilds.fetch(); // mise à jour des guilds du BOT dans le cache
-    if (client.guilds.cache) {
-      for (const guild of client.guilds.cache.values()) {// vérif guild par guild
-        try{
-          await guild.members.fetch({ user: req.params.memberId }); // guilds auxquelles on a accès et où le user est connecté 
-        }catch(error){
-          console.error("Erreur lors de la recherche de guilds:", error);
-        }
-        const mybot = guild.members.cache.get(botId);// BOT ID 
-        if (mybot.permissions.toArray().includes('Administrator')) {// où mon BOT est administrateur
-          if (guild.members.cache) {//vérif qu'on a une valeur pour continuer la logique
-            for (const member of guild.members.cache.values()) {//on passer par chaque member pour remplir l'objet memberInfo
-              let memberInfo = {// objet Membre, on aura que les membres dont l'ID sera celui de l'USER
-                guild_id: member.guild.id,
-                guild_name: member.guild.name, 
-                user_id: member.id,
-                username: member.user.username,
-                roles_array: member.roles.cache.map((role) => role.id),
-                permissions: member.permissions.toArray(),
+// // à améliorer car lorsque le client n'est pas 'on', la route dans le vide indéfiniment
+// // avec setTimeOut, ça devrait être corrigé
+// try {
+//   if (client && client.user) {
+//     const botId = client.user.id;
+//     console.log(botId)
+//     const newtableau = [];
+//     await client.guilds.fetch(); // mise à jour des guilds du BOT dans le cache
+//     if (client.guilds.cache) {
+//       for (const guild of client.guilds.cache.values()) {// vérif guild par guild
+//         try{
+//           await guild.members.fetch({ user: req.params.memberId }); // guilds auxquelles on a accès et où le user est connecté 
+//         }catch(error){
+//           console.error("Erreur lors de la recherche de guilds:", error);
+//         }
+//         const mybot = guild.members.cache.get(botId);// BOT ID 
+//         if (mybot.permissions.toArray().includes('Administrator')) {// où mon BOT est administrateur
+//           if (guild.members.cache) {//vérif qu'on a une valeur pour continuer la logique
+//             for (const member of guild.members.cache.values()) {//on passer par chaque member pour remplir l'objet memberInfo
+//               let memberInfo = {// objet Membre, on aura que les membres dont l'ID sera celui de l'USER
+//                 guild_id: member.guild.id,
+//                 guild_name: member.guild.name, 
+//                 user_id: member.id,
+//                 username: member.user.username,
+//                 roles_array: member.roles.cache.map((role) => role.id),
+//                 permissions: member.permissions.toArray(),
 
-              };
-              if (memberInfo.permissions.includes('ManageGuild')) {//si le membre a le droit manageGuild, on le push dans notre tableau
-                newtableau.push(memberInfo);
-              }
-            }
+//               };
+//               if (memberInfo.permissions.includes('ManageGuild')) {//si le membre a le droit manageGuild, on le push dans notre tableau
+//                 newtableau.push(memberInfo);
+//               }
+//             }
+//           }
+//         }
+//       }
+//       if(newtableau[0]){
+//         res.json({ result: true, arraylength: newtableau.length, tableau: newtableau, });
+//       }else{
+//         res.json({result: false});
+//       }
+//     }
+//   }
+// }
+//   catch (error) {
+//     console.error("Erreur lors de la connexion à Discord:", error);
+//   }
+// });
+
+router.get('/workspaces/:memberId', async (req, res, next) => {
+  try {
+    const client = await connectToDiscord();
+    if (!client || !client.user) {
+      return res.json({ result: false });
+    }
+
+    const botId = client.user.id;
+    const newtableau = [];
+
+    await client.guilds.fetch(); // Mettre à jour le cache des guildes du BOT
+
+    for (const [guildId, guild] of client.guilds.cache) {
+      try {
+        const member = await guild.members.fetch(req.params.memberId);
+        const mybot = guild.members.cache.get(botId);
+
+        if (mybot && mybot.permissions.has('Administrator')) {
+          const memberInfo = {
+            guild_id: guild.id,
+            guild_name: guild.name,
+            user_id: member.id,
+            username: member.user.username,
+            roles_array: member.roles.cache.map((role) => role.id),
+            permissions: member.permissions.toArray(),
+          };
+
+          if (memberInfo.permissions.includes('ManageGuild')) {
+            newtableau.push(memberInfo);
           }
         }
-      }
-      if(newtableau[0]){
-        res.json({ result: true, arraylength: newtableau.length, tableau: newtableau, });
-      }else{
-        res.json({result: false});
+      } catch (error) {
+        console.error("Erreur lors de la recherche de membres dans la guilde:", error);
       }
     }
-  }
-}
-  catch (error) {
+
+    if (newtableau.length > 0) {
+      res.json({ result: true, arraylength: newtableau.length, tableau: newtableau });
+    } else {
+      res.json({ result: false });
+    }
+  } catch (error) {
     console.error("Erreur lors de la connexion à Discord:", error);
+    res.json({ result: false, error: "Erreur lors de la connexion à Discord" });
   }
 });
 
