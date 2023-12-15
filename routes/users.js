@@ -36,9 +36,10 @@ router.get('/workspaces/:memberId', async (req, res, next) => {
 try {
   if (client && client.user) {
     const botId = client.user.id;
+    console.log(botId)
     const newtableau = [];
     await client.guilds.fetch(); // mise à jour des guilds du BOT dans le cache
-    if (client.guilds.cache.values()) {
+    if (client.guilds.cache) {
       for (const guild of client.guilds.cache.values()) {// vérif guild par guild
         try{
           await guild.members.fetch({ user: req.params.memberId }); // guilds auxquelles on a accès et où le user est connecté 
@@ -47,7 +48,7 @@ try {
         }
         const mybot = guild.members.cache.get(botId);// BOT ID 
         if (mybot.permissions.toArray().includes('Administrator')) {// où mon BOT est administrateur
-          if (guild.members.cache.values()) {//vérif qu'on a une valeur pour continuer la logique
+          if (guild.members.cache) {//vérif qu'on a une valeur pour continuer la logique
             for (const member of guild.members.cache.values()) {//on passer par chaque member pour remplir l'objet memberInfo
               let memberInfo = {// objet Membre, on aura que les membres dont l'ID sera celui de l'USER
                 guild_id: member.guild.id,
