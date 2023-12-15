@@ -37,7 +37,7 @@ try {
   if (client && client.user) {
     const botId = client.user.id;
     const newtableau = [];
-    await client.guilds.fetch({ cache: false }); // mise à jour des guilds du BOT dans le cache
+    await client.guilds.fetch(); // mise à jour des guilds du BOT dans le cache
     if (client.guilds.cache.values()) {
       for (const guild of client.guilds.cache.values()) {// vérif guild par guild
         try{
