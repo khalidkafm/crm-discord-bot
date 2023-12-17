@@ -17,7 +17,7 @@ new mongodb.Schema(
 			required: true
 		},
         createdTimestamp: {
-			type: String,
+			type: Date,
 			required: true
 		},
         type: {

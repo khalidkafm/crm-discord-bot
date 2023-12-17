@@ -8,7 +8,7 @@ const upsertGuildInDb = require('./upsertGuildInDb');
 const upsertGuildInviteInDb = require('./upsertGuildInviteInDb');
 const discordToMongoId = require('../utils/idConversion/discordToMongoId');
 
-async function saveJoinEvent(timestamp, member, invite) {
+async function saveJoinEvent(joinedAtTimestamp, member, invite) {
 
     //---------------------------------------------------------------------------------------------------------
     //
@@ -43,7 +43,7 @@ async function saveJoinEvent(timestamp, member, invite) {
         const inviteFromDb = await upsertGuildInviteInDb(invite, guildFromDb)
 
         const newJoinEvent = await new JoinEvent({
-            timestamp,
+            timestamp: joinedAtTimestamp,
             guild: guildFromDb._id,
             member: memberFromDb._id,
             invite: inviteFromDb._id ,
@@ -60,7 +60,7 @@ async function saveJoinEvent(timestamp, member, invite) {
     } else {
         console.log('invite code was not catch. Saving without invite code')
         const newJoinEvent = await new JoinEvent({
-            timestamp,
+            timestamp: joinedAtTimestamp,
             guild: guildFromDb._id,
             member: memberFromDb._id,
         })

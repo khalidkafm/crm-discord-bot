@@ -36,8 +36,12 @@ async function connectToDiscord() {
     ],
   });
 
+  var discordStatus = '';
+
   client.on('ready', async () => {
     // WARNING "ready" isn't really ready. We need to wait a spell. setTimout(1000) could be required!!
+
+    discordStatus = "ready";
 
     // CONSOLE LOGS AT LAUNCH
     console.log(`Logged in as ${client.user.tag}!`);
@@ -168,7 +172,13 @@ async function connectToDiscord() {
     //---------------------------------------------------------------------------------------------------------
 
     client.on("guildMemberAdd", async (member) => {
-      const timestamp = member.joinedAt;
+
+      // Convert the string to a Date object
+      const joinedAtDate = new Date(member.joinedAt);
+
+      // Get the timestamp (UNIX timestamp) from the Date object
+      const joinedAtTimestamp = joinedAtDate.getTime();
+
       console.log(`New User "${member.user.username}" has joined "${member.guild.name}"` );
       // To compare, we need to load the current invite list.
       const newInvites = await member.guild.invites.fetch()
@@ -177,7 +187,7 @@ async function connectToDiscord() {
       // Look through the invites, find the one for which the uses went up.
       const invite = newInvites.find(i => i.uses > oldInvites.get(i.code));
       // A real basic message with the information we need. 
-      const saveOk = await saveJoinEvent(timestamp, member, invite)
+      const saveOk = await saveJoinEvent(joinedAtTimestamp, member, invite)
       console.log('joinEvent saved in db : ', saveOk)
     });
 
