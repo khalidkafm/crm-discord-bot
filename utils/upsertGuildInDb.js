@@ -15,6 +15,14 @@ async function upsertGuildInDb(guild) {
         console.log('guild found in db')
     } else {
         console.log(`saving guild ${guild.id} in db`)
+
+        // Convert the string to a Date object
+        const joinedDate = new Date(guild.joinedTimestamp);
+
+        // Get the timestamp (UNIX timestamp) from the Date object
+        const joinedTimestamp = joinedDate.getTime();
+
+
         try {
             const newGuild = new Guild({
                 _id: discordToMongoId(guild.id),
@@ -23,7 +31,7 @@ async function upsertGuildInDb(guild) {
                 icon: guild.icon,
                 permissions: '', 
                 ownerId: guild.ownerId,
-                joinedTimestamp: guild.joinedTimestamp,
+                joinedTimestamp,
             })
 
             const save = await newGuild.save();

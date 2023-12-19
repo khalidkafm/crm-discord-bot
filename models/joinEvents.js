@@ -4,7 +4,7 @@ const JoinEvent = mongodb.models.JoinEvent || mongodb.model("JoinEvent",
 new mongodb.Schema(
 	{
 		timestamp: {
-			type: String,
+			type: Date,
 			required: true
 		},
 		guild: {

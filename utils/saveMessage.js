@@ -8,13 +8,18 @@ const discordToMongoId = require('../utils/idConversion/discordToMongoId');
 
 async function saveMessage(message) {
 
+        // Convert the string to a Date object
+        const createdDate = new Date(message.createdTimestamp);
+
+        // Get the timestamp (UNIX timestamp) from the Date object
+        const createdTimestamp = createdDate.getTime();
 
     const newMessage = new Message({
         _id: discordToMongoId(message.id),
         channelId: message.channelId,
         guild: discordToMongoId(message.guildId),
         discordId: message.id,
-        createdTimestamp: message.createdTimestamp,
+        createdTimestamp,
         type: message.type,
         content: message.content,
         author: discordToMongoId(message.author.id),

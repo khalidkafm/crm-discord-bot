@@ -10,6 +10,15 @@ async function upsertMemberInDb(member) {
 
     let memberFromDb = await Member.findById(discordToMongoId(member.user.id))
 
+            // Convert the string to a Date object
+            const joinedDate = new Date(member.joinedTimestamp);
+            const premiumSinceDate = new Date(member.premiumSinceTimestamp);
+            // Get the timestamp (UNIX timestamp) from the Date object
+            const joinedTimestamp = joinedDate.getTime();
+            const premiumSinceTimestamp = premiumSinceDate.getTime();
+
+            console.log('member : ', member);
+
     if(memberFromDb){
         console.log('member found in db')
     } else {
@@ -17,6 +26,14 @@ async function upsertMemberInDb(member) {
             _id : discordToMongoId(member.user.id),
             discordId: member.user.id,
             username: member.user.username,
+            globalName: member.user.globalName ,
+            discriminator: member.user.discriminator,
+            isBot: member.user.bot,
+            isSystem: member.user.system,
+            avatar: member.user.avatar,
+            banner: member.user.banner,
+            joinedTimestamp,
+            premiumSinceTimestamp,
         })
 
         try {
