@@ -11,7 +11,27 @@ new mongodb.Schema(
 			type: String,
 			required: true
 		},
+		globalName: {
+			type: String,
+			required: false
+		},
+		discriminator: {
+			type: String,
+			required: false
+		},
+		isBot: {
+			type: Boolean,
+			required: false
+		},
+		isSystem: {
+			type: Boolean,
+			required: false
+		},
 		avatar: {
+			type: String,
+			required: false
+		},
+		banner: {
 			type: String,
 			required: false
 		},
@@ -24,7 +44,11 @@ new mongodb.Schema(
 			required: false
 		},
         joinedTimestamp: {
-			type: Number,
+			type: Date,
+			required: false
+		},
+		premiumSinceTimestamp: {
+			type: Date,
 			required: false
 		},
 	}
