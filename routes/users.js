@@ -82,7 +82,7 @@ router.get('/', function (req, res, next) {
 router.get('/workspaces/:memberId', async (req, res, next) => {
   try {
     const client = await connectToDiscord();
-    if (!client || !client.user) {
+    if (!client || !client.user) {//si connexion rate, result : false
       return res.json({ result: false });
     }
 

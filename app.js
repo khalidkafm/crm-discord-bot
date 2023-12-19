@@ -10,6 +10,7 @@ require('./models/connection')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var meRouter = require('./routes/me');
+var invitesRouter = require('./routes/invites');
 
 var app = express();
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/me', meRouter);
+app.use('/invites', invitesRouter);
 
 require ('./discord/connectBot')
 
