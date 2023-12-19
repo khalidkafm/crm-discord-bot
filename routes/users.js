@@ -100,6 +100,7 @@ router.get('/workspaces/:memberId', async (req, res, next) => {
           const memberInfo = {
             guild_id: guild.id,
             guild_name: guild.name,
+            guild_icon: guild.icon,
             user_id: member.id,
             username: member.user.username,
             roles_array: member.roles.cache.map((role) => role.id),
