@@ -3,7 +3,7 @@ var router = express.Router();
 const Invite = require('../models/invites')
 const { Client, GatewayIntentBits, ClientUser } = require('discord.js');
 require('dotenv').config()
-const {ObjectId} = require('mongodb').ObjectId;
+const {ObjectId} = require('mongodb');
 
 
 router.put('/edit/:_id', function (req, res, next) {
@@ -25,7 +25,7 @@ router.post('/newLink', function (req, res, next) {
             code: "mockDataCode",
             name: req.body.name,
             description: req.body.description,
-            guild: new ObjectId('000001183804670381142076'), 
+            guild: new ObjectId(req.body.guildId), 
             creator: "mockDataCreator",
         })
         newInvite.save().then(()=>{
