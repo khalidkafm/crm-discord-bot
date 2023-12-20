@@ -19,6 +19,7 @@ async function upsertAllGuildInvites(guildFromDb, codes) {
           const newInvite = new Invite({
             code: code,
             name: code,
+            description: "",
             guild: guildFromDb._id,
           });
 
