@@ -93,7 +93,95 @@ router.get('/invites/:guildId', async function(req, res, next) {
 
 });
 
+/* POST /populate a guild's invite in db with mock data  */
+router.post('/populate', async function(req, res, next) {
+  
+  if (req.body && req.body.inviteId){
+    const invite = await Invite.findOne({_id: new ObjectId(discordToMongoId(req.body.inviteId))});
+    if ( invite ) {
+      console.log(invite)
 
+          const memberNames = ["m.allan.01","Georgina203","Khalid influencer","raida7885","frqnku","lepandamalade","neevaik","docs2309","khalidkaf89","Cedric"]
+          const members = [];
+          const joinEvents = [];
+          const messages = [];
+          
+          for (let i=0; i<1; i++){
+            for(let memberName of memberNames){
+              const newMember = new Member({
+                  discordId: `${discordToMongoId(Math.floor(Math.random()*1000000))}`,
+                  username: memberName + Math.floor(Math.random()*1000),
+                  globalName: memberName,
+                  discriminator: "0",
+                  isBot: false,
+                  isSystem: false,
+                  avatar: null,
+                  banner: null,
+                  permissions: [],
+                  roles: [],
+                  joinedTimestamp: (new Date()).getTime(),
+                  premiumSinceTimestamp: (new Date()).getTime(),
+                })
+              //console.log('saving newMember :', newMember)
+              const member = await newMember.save()
+              members.push(member)
+              //console.log('members array :',members)
+
+              // Calculer le timestamp maximum (date actuelle)
+              const maxTimestamp = (new Date()).getTime();
+              // Calculer le timestamp minimum (il y a trois semaines)
+              const minTimestamp = maxTimestamp - 3 * 7 * 24 * 60 * 60 * 1000; // 3 semaines en millisecondes
+              const joinTimestamp = Math.floor(Math.random() * (maxTimestamp - minTimestamp + 1)) + minTimestamp;
+
+              const newJoinEvent = new JoinEvent({
+                  timestamp: joinTimestamp,
+                  guild: invite.guild,
+                  member: member._id,
+                  invite: invite._id,
+              })
+              //console.log('saving newJoinEvent :', newJoinEvent)
+              const joinEvent = await newJoinEvent.save()
+              joinEvents.push(joinEvent)
+              //console.log('saved joinEvent :', joinEvent)
+
+                for (let i=0; i<30; i++){
+                  const messageTimestamp = Math.floor(Math.random() * (maxTimestamp - joinTimestamp + 1)) + joinTimestamp;
+                  const newMessage = new Message({
+                    discordId: invite.guild.toString(),
+                    channelId: "1045256538618597436",
+                    guild: invite.guild,
+                    createdTimestamp: messageTimestamp,
+                    type: 0,
+                    content: "generated message" + Math.floor(Math.random()*100000000),
+                    author: member._id,
+                })
+                  //console.log("newMessage : ", newMessage)
+                  const message = await newMessage.save();
+                  messages.push(message);
+                  //console.log("messages : ", messages)
+                }
+            }
+          }
+
+      res.json({
+        result: true,
+        populated: `${messages.length} messages, ${members.length} members, ${joinEvents.length} joinEvents, for invite ${invite.code},on guild ${invite.guild.toString()}`,
+        })
+    } else {
+      res.json({
+        result: false,
+        message: "invite not found in db",
+        })
+    }
+
+  } else {
+    res.json({
+      result: false,
+      message: "missing inviteId in request's body",
+      })
+  }
+  
+});
 
 
 module.exports = router;
