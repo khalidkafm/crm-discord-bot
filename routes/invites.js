@@ -25,7 +25,7 @@ router.post('/newLink', async (req, res, next) => {
     try {
         const client = await connectToDiscord("MTE3OTExMjI5NjQxMzQxNzU4NA.Go96Yl.pym5GrhFzkiop_IKq8D-zvNGYuoqdS_slPyGU8");
         // const guildId = req.body.guild
-        const guildId = "1179468608410234941"
+        const guildId = req.body.guild;
         const guild = await client.guilds.fetch(guildId);
 
         const textChannels = guild.channels.cache.filter(channel => channel.type == '0');
