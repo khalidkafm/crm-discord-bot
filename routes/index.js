@@ -99,13 +99,12 @@ router.post('/populate', async function(req, res, next) {
   if (req.body && req.body.inviteId){
     const invite = await Invite.findOne({_id: new ObjectId(discordToMongoId(req.body.inviteId))});
     if ( invite ) {
-      console.log(invite)
 
           const memberNames = ["m.allan.01","Georgina203","Khalid influencer","raida7885","frqnku","lepandamalade","neevaik","docs2309","khalidkaf89","Cedric"]
           const members = [];
           const joinEvents = [];
           const messages = [];
-          
+          /*
           for (let i=0; i<1; i++){
             for(let memberName of memberNames){
               const newMember = new Member({
@@ -163,7 +162,7 @@ router.post('/populate', async function(req, res, next) {
                 }
             }
           }
-
+          */
       res.json({
         result: true,
         populated: `${messages.length} messages, ${members.length} members, ${joinEvents.length} joinEvents, for invite ${invite.code},on guild ${invite.guild.toString()}`,
