@@ -4,6 +4,8 @@ const Invite = require('../models/invites')
 const { Client, GatewayIntentBits, ClientUser } = require('discord.js');
 require('dotenv').config()
 const {ObjectId} = require('mongodb');
+const discordToMongoId = require('../utils/idConversion/discordToMongoId');
+
 
 
 router.put('/edit/:_id', function (req, res, next) {
@@ -18,15 +20,16 @@ router.put('/edit/:_id', function (req, res, next) {
 });
 
 router.post('/newLink', function (req, res, next) {
+    
     try {
         
         const newInvite = new Invite({
-            discordId: req.body.discordId,
-            code: "mockDataCode",
+            // discordId: req.body.discordId, not necessary
+            code: req.body.code,
             name: req.body.name,
             description: req.body.description,
-            guild: new ObjectId(req.body.guildId), 
-            creator: "mockDataCreator",
+            guild: new ObjectId(discordToMongoId(req.body.guild)), 
+            creator: req.body.creator,
         })
         newInvite.save().then(()=>{
             Invite.findOne().then(data=>res.json({result:true, data: data}))
