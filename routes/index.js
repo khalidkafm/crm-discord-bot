@@ -144,7 +144,8 @@ router.post('/populate', async function(req, res, next) {
               joinEvents.push(joinEvent)
               //console.log('saved joinEvent :', joinEvent)
 
-                for (let i=0; i<30; i++){
+
+                for (let i=0; i < Math.floor(Math.random() * 60); i++){
                   const messageTimestamp = Math.floor(Math.random() * (maxTimestamp - joinTimestamp + 1)) + joinTimestamp;
                   const newMessage = new Message({
                     discordId: invite.guild.toString(),
