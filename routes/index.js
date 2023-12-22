@@ -104,7 +104,7 @@ router.post('/populate', async function(req, res, next) {
           const members = [];
           const joinEvents = [];
           const messages = [];
-          /*
+          
           for (let i=0; i<1; i++){
             for(let memberName of memberNames){
               const newMember = new Member({
@@ -162,7 +162,7 @@ router.post('/populate', async function(req, res, next) {
                 }
             }
           }
-          */
+          
       res.json({
         result: true,
         populated: `${messages.length} messages, ${members.length} members, ${joinEvents.length} joinEvents, for invite ${invite.code},on guild ${invite.guild.toString()}`,
